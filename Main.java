@@ -81,6 +81,7 @@ public class Main {
 		docChecker.tell(Actors.poisonPill());
 		
 		// FIXME Passengers should die once they leave the security line or at the end of the day (when the jail kills them)
+		// This next line should be removed.
 		Actors.registry().shutdownAll();
 	}
 }

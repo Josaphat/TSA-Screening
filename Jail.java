@@ -9,9 +9,11 @@ public class Jail extends UntypedActor {
 	public void onReceive(Object msg) throws Exception {
 		// TODO Implement Jail message handling
 		if(msg instanceof String && ((String)msg).equals("LINE STOPPED")) {
+			// TODO Log message received
 			this.shutdownCounter++;
 			if(shutdownCounter == Main.NUM_LINES) {
-				getContext().tell(Actors.poisonPill());
+				// TODO Log message sent
+				getContext().tell(Actors.poisonPill(), getContext());
 			}
 		} else {
 			unhandled(msg);
