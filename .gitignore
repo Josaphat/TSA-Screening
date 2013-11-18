@@ -1,6 +1,7 @@
 *.aux
 *.log
 *.dvi
+*.class
 .classpath
 .project
 bin/
