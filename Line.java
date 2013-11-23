@@ -1,11 +1,7 @@
-import java.util.ArrayList;
-import java.util.List;
-
 import akka.actor.ActorRef;
-import akka.actor.Actors;
 import akka.actor.UntypedActor;
 
-public class Line extends UntypedActor {
+public class Line {
 	private final ActorRef jail;
 	
 	private final ActorRef queue;
@@ -13,74 +9,56 @@ public class Line extends UntypedActor {
 	private final ActorRef bodyScanner;
 	private final ActorRef securityStation;
 	
-	public Line(final ActorRef jail) {
+	public Line(final ActorRef jail, final ActorRef securityStation, final ActorRef bodyScanner, final ActorRef baggageScanner, final ActorRef queue) {
 		this.jail = jail;
-		this.queue = Actors.actorOf(Queue.class).start();
-		this.baggageScanner = Actors.actorOf(BaggageScanner.class).start();
-		this.bodyScanner = Actors.actorOf(BodyScanner.class).start();
-		this.securityStation = Actors.actorOf(SecurityStation.class).start();
+		
+		this.securityStation = securityStation;
+		
+		this.bodyScanner = bodyScanner;
+		
+		this.baggageScanner = baggageScanner;
+		
+		this.queue = queue;
 	}
 	
-	@Override
-	public void onReceive(Object msg) throws Exception {
-		// TODO Implement Line message handling
-		if(msg instanceof EnterQueue) {
-			// TODO Log message received
-			// TODO Log messages sent
-			this.queue.tell(msg, getContext().getSender().get()); // Forward down to the Queue
-			getContext().getSender().get().tell(new Passenger.ProceedToBagScan(this.baggageScanner), getContext());
-		}
-		else if(msg instanceof String && ((String)msg).equals("SHUT DOWN")) {
-			// TODO Log message received
-			// TODO Log message sent
-			getContext().tell(Actors.poisonPill(), getContext());
-		}
-		else {
-			unhandled(msg);
-		}
+	public ActorRef getQueue() {
+		return this.queue;
 	}
 	
-	@Override
-	public void postStop() {
-		System.out.println("Line stopped.");
-		this.jail.tell("LINE STOPPED");
+	public ActorRef getBaggageScanner() {
+		return this.baggageScanner;
 	}
 	
+	public ActorRef getBodyScanner() {
+		return this.bodyScanner;
+	}
+	
+	public ActorRef getSecurityStation() {
+		return this.securityStation;
+	}
+	
+	public void shutDown() {
+		// TODO Coordinate killing the actors
+		// Necessary?
+	}
 	
 	//
 	// "Child" actors
 	//
-	static class Queue extends UntypedActor {
-		private final List<ActorRef> passengers;
-		
-		public Queue() {
-			this.passengers = new ArrayList<ActorRef>();
-		}
-
-		@Override
-		public void onReceive(Object msg) throws Exception {
-			// TODO Implement Queue message handling
-			if(msg instanceof EnterQueue) {
-				// TODO Log message received
-				ActorRef passenger = ((EnterQueue)msg).getPassenger();
-				this.passengers.add(passenger);
-				System.out.println("Passenger added to queue.");
-			}
-			else { 
-				unhandled(msg);
-			}
-		}
-		
-	}
 	
 	static class BaggageScanner extends UntypedActor {
-
+		private final ActorRef securityStation;
+		
+		public BaggageScanner(final ActorRef securityStation) {
+			this.securityStation = securityStation;
+		}
+		
 		@Override
 		public void onReceive(Object msg) throws Exception {
 			if(msg instanceof Baggage) {
-				// TODO Log message received
+				Baggage message = (Baggage)msg;
 				System.out.println("Scanning bag...");
-				// TODO Send baggage scan report
+				this.securityStation.tell(new SecurityStation.SecurityReport(getContext().getSender().get(), message.isSafe()),getContext());
 			}
 			else {
 				unhandled(msg);
@@ -99,37 +77,41 @@ public class Line extends UntypedActor {
 	}
 	
 	static class BodyScanner extends UntypedActor {
-
+		private final ActorRef securityStation;
+		private ActorRef queue;
+		
+		public BodyScanner(final ActorRef securityStation) {
+			this.securityStation = securityStation;
+		}
+		
 		@Override
 		public void onReceive(Object msg) throws Exception {
-			// TODO Implement BodyScanner message handling
-			unhandled(msg);
+			if(msg instanceof GiveQueue) {
+				this.queue = ((GiveQueue)msg).getQueue();
+				this.queue.tell(new Ready(), getContext());
+			}
+			else if(msg instanceof Passenger.Body) {
+				Passenger.Body message = (Passenger.Body)msg;
+				System.out.println("Scanning passenger body...");
+				this.securityStation.tell(new SecurityStation.SecurityReport(getContext().getSender().get(), message.isSafe()), getContext());
+				this.queue.tell(new Ready(), getContext());
+			} else {
+				unhandled(msg);
+			}
 		}
 		
-	}
-	
-	static class SecurityStation extends UntypedActor {
-
-		@Override
-		public void onReceive(Object msg) throws Exception {
-			// TODO Implement SecurityStation message handling
-			unhandled(msg);
+		static class Ready {
+			
 		}
 		
-	}
-	
-	//
-	// Messages
-	//
-	static class EnterQueue {
-		private final ActorRef passenger;
-		
-		public EnterQueue(final ActorRef passenger) {
-			this.passenger = passenger;
-		}
-		
-		public ActorRef getPassenger() {
-			return this.passenger;
+		static class GiveQueue {
+			private final ActorRef queue;
+			public GiveQueue(final ActorRef queue) {
+				this.queue = queue;
+			}
+			public ActorRef getQueue() {
+				return this.queue;
+			}
 		}
 	}
 }

@@ -1,21 +1,35 @@
+import java.util.ArrayList;
+import java.util.List;
+
+import akka.actor.ActorRef;
 import akka.actor.Actors;
 import akka.actor.UntypedActor;
 
 
 public class Jail extends UntypedActor {
-	private int shutdownCounter = 0;
+	private final List<ActorRef> prisoners;
+	
+	private int shutdownCounter;
 
+	public Jail() {
+		this.shutdownCounter = 0;
+		this.prisoners = new ArrayList<ActorRef>();
+	}
+	
 	@Override
 	public void onReceive(Object msg) throws Exception {
-		// TODO Implement Jail message handling
 		if(msg instanceof String && ((String)msg).equals("LINE STOPPED")) {
-			// TODO Log message received
 			this.shutdownCounter++;
 			if(shutdownCounter == Main.NUM_LINES) {
-				// TODO Log message sent
 				getContext().tell(Actors.poisonPill(), getContext());
 			}
-		} else {
+		}
+		else if(msg instanceof EnterJail) {
+			EnterJail message = (EnterJail)msg;
+			this.prisoners.add(message.getPassenger());
+			System.out.println("Throwing passenger in jail.");
+		}
+		else {
 			unhandled(msg);
 		}
 	}
@@ -24,5 +38,21 @@ public class Jail extends UntypedActor {
 	public void postStop() {
 		// TODO Take passengers to real jail. (i.e. Shut the actors down)
 		System.out.println("Jail stopped.");
+		for(ActorRef prisoner : this.prisoners) {
+			prisoner.tell(Actors.poisonPill());
+		}
+	}
+	
+	//
+	// Messages
+	//
+	static class EnterJail {
+		private final ActorRef passenger;
+		public EnterJail(final ActorRef passenger) {
+			this.passenger = passenger;
+		}
+		public ActorRef getPassenger() {
+			return this.passenger;
+		}
 	}
 }

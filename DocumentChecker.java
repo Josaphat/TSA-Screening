@@ -1,35 +1,32 @@
 import java.util.List;
 
-import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
 
 
 public class DocumentChecker extends UntypedActor {
-	private final List<ActorRef> lines;
+	private final List<Line> lines;
 	private int nextIndex;
 	
-	public DocumentChecker(List<ActorRef> lines) {
+	public DocumentChecker(List<Line> lines) {
 		this.lines = lines;
 		this.nextIndex = 0;
 	}
 	
-	private ActorRef nextLine() {
-		ActorRef line = this.lines.get(nextIndex);
+	private Line nextLine() {
+		Line line = this.lines.get(nextIndex);
 		nextIndex = (++nextIndex) % lines.size();
 		return line;
 	}
 
 	@Override
 	public void onReceive(Object msg) throws Exception {
-		// TODO Implement DocumentChecker message handling
 		if(msg instanceof TravelDocuments) {
-			// TODO Log message received
-			// TODO Log message sent
 			TravelDocuments docs = (TravelDocuments)msg;
 			if(docs.areValid()) {
-				getContext().getSender().get().tell(new Passenger.DocumentsPassed(this.nextLine()));
+				Line nextLine = this.nextLine();
+				getContext().getSender().get().tell(new Passenger.DocumentsPassed(nextLine.getBaggageScanner(), nextLine.getQueue()), getContext());
 			} else {
-				getContext().getSender().get().tell(new Passenger.DocumentsFailed());
+				getContext().getSender().get().tell(new Passenger.DocumentsFailed(), getContext());
 			}
 		} else {
 			unhandled(msg);
@@ -38,8 +35,9 @@ public class DocumentChecker extends UntypedActor {
 	
 	@Override
 	public void postStop() {
-		for(ActorRef line : this.lines) {
-			line.tell("SHUT DOWN");
+		for(Line line : this.lines) {
+			line.shutDown();
+			//line.tell("SHUT DOWN");
 		}
 	}
 

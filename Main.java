@@ -12,8 +12,9 @@ public class Main {
 	public static final int NUM_LINES = 4;
 	/** Unit of simulated time */
 	public static final long ONE_MINUTE = 10L;
+	private static final long ONE_HOUR = 60L * ONE_MINUTE;
 	/* Length of the "day" being simulated */
-	private static final long SIMULATION_LENGTH = 480L * ONE_MINUTE;
+	private static final long SIMULATION_LENGTH = 1L * ONE_HOUR;
 	
 	/** Percent chance of failing the document check. */
 	public static final double DOCUMENT_FAIL_CHANCE = 0.20;
@@ -34,19 +35,41 @@ public class Main {
 		final ActorRef jail = Actors.actorOf(Jail.class);
 		jail.start();
 		
-		final List<ActorRef> lines = new ArrayList<ActorRef>();
+		final List<Line> lines = new ArrayList<Line>();
 		System.out.println("Starting " + Main.NUM_LINES + " lines.");
 		for(int i = 0; i < Main.NUM_LINES; i++) {
 			System.out.println("\tStarting line " + i);
-			final ActorRef lineRef = Actors.actorOf(new UntypedActorFactory() {
-
+			final ActorRef securityStation = Actors.actorOf(new UntypedActorFactory() {
 				@Override
-				public UntypedActor create() {
-					return new Line(jail);
+				public Actor create() {
+					return new SecurityStation(jail);
 				}
-			});
-			lineRef.start();
-			lines.add(lineRef);
+			}).start();
+			
+			final ActorRef bodyScanner = Actors.actorOf(new UntypedActorFactory() {
+				@Override
+				public Actor create() {
+					return new Line.BodyScanner(securityStation);
+				}
+			}).start();
+			
+			final ActorRef bagScanner = Actors.actorOf(new UntypedActorFactory(){
+				@Override
+				public Actor create() {
+					return new Line.BaggageScanner(securityStation);
+				}
+			}).start();
+			
+			final ActorRef queue = Actors.actorOf(new UntypedActorFactory() {
+				@Override
+				public Actor create() {
+					return new Queue(bodyScanner);
+				}
+			}).start();
+			bodyScanner.tell(new Line.BodyScanner.GiveQueue(queue), null);
+			
+			Line line = new Line(jail, securityStation, bodyScanner, bagScanner, queue);
+			lines.add(line);
 		}
 		
 		System.out.println("Starting the DocumentChecker.");
@@ -72,16 +95,17 @@ public class Main {
 						}
 					});
 					passenger.start();
-					passenger.tell(new Passenger.ProceedToDocumentChecker(docChecker));
+					passenger.tell(new Passenger.ProceedToDocumentChecker(docChecker), null);
 				}
 			}
 		}
 		System.out.println("Simulation over.");
 		// Shut down the document checker. It notifies the line to shut down. Lines notify the jail.
 		docChecker.tell(Actors.poisonPill());
+		jail.tell(Actors.poisonPill());
 		
 		// FIXME Passengers should die once they leave the security line or at the end of the day (when the jail kills them)
-		// This next line should be removed.
+		// Currently this line ices all the accumulated passenger actors at the end of the day.
 		Actors.registry().shutdownAll();
 	}
 }
