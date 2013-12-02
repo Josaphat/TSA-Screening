@@ -39,36 +39,41 @@ public class Main {
 		System.out.println("Starting " + Main.NUM_LINES + " lines.");
 		for(int i = 0; i < Main.NUM_LINES; i++) {
 			System.out.println("\tStarting line " + i);
+			final int lineId = i +1;
 			final ActorRef securityStation = Actors.actorOf(new UntypedActorFactory() {
 				@Override
 				public Actor create() {
 					return new SecurityStation(jail);
 				}
-			}).start();
+			});
+			securityStation.start();
 			
 			final ActorRef bodyScanner = Actors.actorOf(new UntypedActorFactory() {
 				@Override
 				public Actor create() {
-					return new Line.BodyScanner(securityStation);
+					return new Line.BodyScanner(securityStation,lineId);
 				}
-			}).start();
+			});
+			bodyScanner.start();
 			
 			final ActorRef bagScanner = Actors.actorOf(new UntypedActorFactory(){
 				@Override
 				public Actor create() {
-					return new Line.BaggageScanner(securityStation);
+					return new Line.BaggageScanner(securityStation,lineId);
 				}
-			}).start();
+			});
+			bagScanner.start();
 			
 			final ActorRef queue = Actors.actorOf(new UntypedActorFactory() {
 				@Override
 				public Actor create() {
-					return new Queue(bodyScanner);
+					return new Queue(bodyScanner,lineId);
 				}
-			}).start();
+			});
+			queue.start();
 			bodyScanner.tell(new Line.BodyScanner.GiveQueue(queue), null);
 			
-			Line line = new Line(jail, securityStation, bodyScanner, bagScanner, queue);
+			Line line = new Line(jail, securityStation, bodyScanner, bagScanner, queue,i+1);
 			lines.add(line);
 		}
 		
@@ -87,7 +92,7 @@ public class Main {
 		while(System.currentTimeMillis() - Main.startTime <= Main.SIMULATION_LENGTH) {
 			if(System.currentTimeMillis() % Main.ONE_MINUTE == 0) {
 				// 50% chance of generating a passenger per simulated minute
-				if(Math.random() < .50) {
+				if(Math.random() < .10) {
 					ActorRef passenger = Actors.actorOf(new UntypedActorFactory(){
 						@Override
 						public UntypedActor create() {

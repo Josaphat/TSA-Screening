@@ -7,13 +7,14 @@ import akka.actor.UntypedActor;
 public class Queue extends UntypedActor {
 	private final java.util.Queue<ActorRef> passengers;
 	private final ActorRef bodyScanner;
-
 	private boolean scannerReady;
+	private int lineId;
 
-	public Queue(final ActorRef bodyScanner) {
+	public Queue(final ActorRef bodyScanner, int lineId) {
 		this.passengers = new LinkedList<ActorRef>();
 		this.bodyScanner = bodyScanner;
 		this.scannerReady = false;
+		this.lineId = lineId;
 	}
 
 	@Override
@@ -25,7 +26,7 @@ public class Queue extends UntypedActor {
 				passenger.tell(new Passenger.ProceedToBodyScan(this.bodyScanner), getContext());
 				this.scannerReady = false;
 			} else {
-				System.out.println("Passenger added to queue.");
+				System.out.println("(Line " +lineId+  ") Passenger added to queue.");
 				this.passengers.add(passenger);
 			}
 		}
@@ -43,7 +44,7 @@ public class Queue extends UntypedActor {
 
 	@Override
 	public void postStop() {
-		System.out.println("Queue stopped.");
+		System.out.println("(Line " +lineId+  ") Queue stopped.");
 	}
 	static class EnterQueue {
 		private final ActorRef passenger;

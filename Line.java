@@ -2,14 +2,16 @@ import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
 
 public class Line {
-	private final ActorRef jail;
-	
+	private final ActorRef jail;	
 	private final ActorRef queue;
 	private final ActorRef baggageScanner;
 	private final ActorRef bodyScanner;
 	private final ActorRef securityStation;
+	private int lineId;
 	
-	public Line(final ActorRef jail, final ActorRef securityStation, final ActorRef bodyScanner, final ActorRef baggageScanner, final ActorRef queue) {
+	public Line(final ActorRef jail, final ActorRef securityStation,
+				 final ActorRef bodyScanner, final ActorRef baggageScanner,
+				  final ActorRef queue, int lineId) {
 		this.jail = jail;
 		
 		this.securityStation = securityStation;
@@ -19,6 +21,8 @@ public class Line {
 		this.baggageScanner = baggageScanner;
 		
 		this.queue = queue;
+
+		this.lineId = lineId;
 	}
 	
 	public ActorRef getQueue() {
@@ -48,16 +52,18 @@ public class Line {
 	
 	static class BaggageScanner extends UntypedActor {
 		private final ActorRef securityStation;
+		private int lineId;
 		
-		public BaggageScanner(final ActorRef securityStation) {
+		public BaggageScanner(final ActorRef securityStation, int lineId) {
 			this.securityStation = securityStation;
+			this.lineId = lineId;
 		}
 		
 		@Override
 		public void onReceive(Object msg) throws Exception {
 			if(msg instanceof Baggage) {
 				Baggage message = (Baggage)msg;
-				System.out.println("Scanning bag...");
+				System.out.println("(Line " +lineId+  ") Scanning bag...");
 				this.securityStation.tell(new SecurityStation.SecurityReport(getContext().getSender().get(), message.isSafe()),getContext());
 			}
 			else {
@@ -79,9 +85,11 @@ public class Line {
 	static class BodyScanner extends UntypedActor {
 		private final ActorRef securityStation;
 		private ActorRef queue;
+		private int lineId;
 		
-		public BodyScanner(final ActorRef securityStation) {
+		public BodyScanner(final ActorRef securityStation,int lineId) {
 			this.securityStation = securityStation;
+			this.lineId = lineId;
 		}
 		
 		@Override
@@ -92,7 +100,7 @@ public class Line {
 			}
 			else if(msg instanceof Passenger.Body) {
 				Passenger.Body message = (Passenger.Body)msg;
-				System.out.println("Scanning passenger body...");
+				System.out.println("(Line " +lineId+  ") Scanning passenger body...");
 				this.securityStation.tell(new SecurityStation.SecurityReport(getContext().getSender().get(), message.isSafe()), getContext());
 				this.queue.tell(new Ready(), getContext());
 			} else {
