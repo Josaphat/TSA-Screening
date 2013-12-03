@@ -8,7 +8,7 @@ public class Queue extends UntypedActor {
 	private final java.util.Queue<ActorRef> passengers;
 	private final ActorRef bodyScanner;
 	private boolean scannerReady;
-	private int lineId;
+	private final int lineId;
 
 	public Queue(final ActorRef bodyScanner, int lineId) {
 		this.passengers = new LinkedList<ActorRef>();

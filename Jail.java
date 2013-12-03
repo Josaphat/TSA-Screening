@@ -36,7 +36,6 @@ public class Jail extends UntypedActor {
 	
 	@Override
 	public void postStop() {
-		// TODO Take passengers to real jail. (i.e. Shut the actors down)
 		System.out.println("Jail stopped.");
 		for(ActorRef prisoner : this.prisoners) {
 			prisoner.tell(Actors.poisonPill());

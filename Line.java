@@ -7,7 +7,7 @@ public class Line {
 	private final ActorRef baggageScanner;
 	private final ActorRef bodyScanner;
 	private final ActorRef securityStation;
-	private int lineId;
+	private final int lineId;
 	
 	public Line(final ActorRef jail, final ActorRef securityStation,
 				 final ActorRef bodyScanner, final ActorRef baggageScanner,
@@ -56,7 +56,7 @@ public class Line {
 	
 	static class BaggageScanner extends UntypedActor {
 		private final ActorRef securityStation;
-		private int lineId;
+		private final int lineId;
 		
 		public BaggageScanner(final ActorRef securityStation, int lineId) {
 			this.securityStation = securityStation;
@@ -89,7 +89,7 @@ public class Line {
 	static class BodyScanner extends UntypedActor {
 		private final ActorRef securityStation;
 		private ActorRef queue;
-		private int lineId;
+		private final int lineId;
 		
 		public BodyScanner(final ActorRef securityStation,int lineId) {
 			this.securityStation = securityStation;

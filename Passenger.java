@@ -4,7 +4,7 @@ import akka.actor.UntypedActor;
 
 public class Passenger extends UntypedActor {
 
-	private int passengerId;
+	private final int passengerId;
 
 	public Passenger(int passengerId){
 		this.passengerId = passengerId;

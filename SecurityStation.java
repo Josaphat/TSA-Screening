@@ -15,7 +15,7 @@ import akka.actor.UntypedActor;
 public class SecurityStation extends UntypedActor {
 	private final ActorRef jail;
 	private final Map<UUID, Boolean> log;
-	private int lineId;
+	private final int lineId;
 	
 	public SecurityStation(final ActorRef jail, int lineId) {
 		this.jail = jail;
@@ -32,7 +32,6 @@ public class SecurityStation extends UntypedActor {
 					// TODO Send passenger on their way
 					System.out.println("SecurityStation<Line "+lineId+"> tells passenger both scans passed.");
 				} else {
-					// TODO Send passenger to jail
 					System.out.println("SecurityStation<Line "+lineId+"> arrests passenger.");
 					report.getPassenger().tell(new Passenger.ProceedToJail(this.jail), getContext());
 				}
