@@ -22,11 +22,11 @@ public class Queue extends UntypedActor {
 		if(msg instanceof EnterQueue) {
 			ActorRef passenger = ((EnterQueue)msg).getPassenger();
 			if(this.scannerReady) {
-				System.out.println("Passenger entering queue. Scanner is ready. Send them.");
+				System.out.println("Body Scanner<Line "+lineId+"> is ready. Send next Passenger.");
 				passenger.tell(new Passenger.ProceedToBodyScan(this.bodyScanner), getContext());
 				this.scannerReady = false;
 			} else {
-				System.out.println("(Line " +lineId+  ") Passenger added to queue.");
+				System.out.println("Passenger added to Queue<Line "+lineId + ">.");
 				this.passengers.add(passenger);
 			}
 		}
@@ -34,6 +34,7 @@ public class Queue extends UntypedActor {
 			if(this.passengers.isEmpty()) {
 				this.scannerReady = true;
 			} else {
+				System.out.println("Passenger at front of Queue<Line "+lineId+"> instructed to proceed to Body Scanner");
 				this.passengers.remove().tell(new Passenger.ProceedToBodyScan(this.bodyScanner), getContext());
 			}
 		}

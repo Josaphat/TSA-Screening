@@ -11,7 +11,7 @@ public class Main {
 	/** The number of security lines in the simulation */
 	public static final int NUM_LINES = 4;
 	/** Unit of simulated time */
-	public static final int ONE_MINUTE = 10;  //Number of miliseconds in a minute
+	public static final int ONE_MINUTE = 5;  //Number of miliseconds in a minute
 	private static final int ONE_HOUR = 60 * ONE_MINUTE; // Number of milliseconds in an hour
 	/* Length of the "day" being simulated */
 	private static final long SIMULATION_LENGTH = 1L * ONE_HOUR;
