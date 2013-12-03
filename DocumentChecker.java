@@ -1,6 +1,7 @@
 import java.util.List;
 
 import akka.actor.UntypedActor;
+import akka.actor.ActorRef;
 
 
 public class DocumentChecker extends UntypedActor {
@@ -24,8 +25,10 @@ public class DocumentChecker extends UntypedActor {
 			TravelDocuments docs = (TravelDocuments)msg;
 			if(docs.areValid()) {
 				Line nextLine = this.nextLine();
+				System.out.println("Document Checker assigns Passenger" + docs.getId() + " to line " + nextLine.getId() + ".");
 				getContext().getSender().get().tell(new Passenger.DocumentsPassed(nextLine.getBaggageScanner(), nextLine.getQueue()), getContext());
 			} else {
+				System.out.println("Document Checker rejects Passenger" + docs.getId() + "'s travel documents.");
 				getContext().getSender().get().tell(new Passenger.DocumentsFailed(), getContext());
 			}
 		} else {
@@ -46,11 +49,16 @@ public class DocumentChecker extends UntypedActor {
 	///
 	static class TravelDocuments {
 		private final boolean areValid;
-		public TravelDocuments() {
+		private final int passengerId;
+		public TravelDocuments(int passengerId) {
+			this.passengerId = passengerId;
 			this.areValid = Math.random() >= Main.DOCUMENT_FAIL_CHANCE;
 		}
 		public boolean areValid() {
 			return this.areValid;
+		}
+		public int getId(){
+			return passengerId;
 		}
 	}
 }

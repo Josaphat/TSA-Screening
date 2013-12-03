@@ -45,6 +45,10 @@ public class Line {
 		// TODO Coordinate killing the actors
 		// Necessary?
 	}
+
+	public int getId(){
+		return lineId;
+	}
 	
 	//
 	// "Child" actors

@@ -19,7 +19,7 @@ public class Passenger extends UntypedActor {
 		if(msg instanceof ProceedToDocumentChecker) {
 			ProceedToDocumentChecker message = (ProceedToDocumentChecker)msg;
 			System.out.println("Passenger " + passengerId + " gives documents to document checker." );
-			message.getDocumentChecker().tell(new DocumentChecker.TravelDocuments(), getContext());
+			message.getDocumentChecker().tell(new DocumentChecker.TravelDocuments(passengerId), getContext());
 		}
 		else if(msg instanceof DocumentsPassed) {
 			DocumentsPassed message = (DocumentsPassed)msg;
