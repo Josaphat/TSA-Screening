@@ -43,7 +43,7 @@ public class Main {
 			final ActorRef securityStation = Actors.actorOf(new UntypedActorFactory() {
 				@Override
 				public Actor create() {
-					return new SecurityStation(jail);
+					return new SecurityStation(jail,lineId);
 				}
 			});
 			securityStation.start();

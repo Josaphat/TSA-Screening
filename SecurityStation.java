@@ -15,10 +15,12 @@ import akka.actor.UntypedActor;
 public class SecurityStation extends UntypedActor {
 	private final ActorRef jail;
 	private final Map<UUID, Boolean> log;
+	private int lineId;
 	
-	public SecurityStation(final ActorRef jail) {
+	public SecurityStation(final ActorRef jail, int lineId) {
 		this.jail = jail;
 		this.log = new HashMap<UUID, Boolean>();
+		this.lineId = lineId;
 	}
 
 	@Override
@@ -28,10 +30,10 @@ public class SecurityStation extends UntypedActor {
 			if(this.log.containsKey(report.getPassenger().getUuid())) {
 				if(report.getScanPassed() && this.log.get(report.getPassenger().getUuid())) {
 					// TODO Send passenger on their way
-					System.out.println("Both scans passed.");
+					System.out.println("SecurityStation<Line "+lineId+"> tells passenger both scans passed.");
 				} else {
 					// TODO Send passenger to jail
-					System.out.println("At least one scan failed.");
+					System.out.println("SecurityStation<Line "+lineId+"> arrests passenger.");
 					report.getPassenger().tell(new Passenger.ProceedToJail(this.jail), getContext());
 				}
 			} else {
