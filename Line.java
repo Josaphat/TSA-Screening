@@ -2,7 +2,6 @@ import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
 
 public class Line {
-	private final ActorRef jail;	
 	private final ActorRef queue;
 	private final ActorRef baggageScanner;
 	private final ActorRef bodyScanner;
@@ -12,7 +11,6 @@ public class Line {
 	public Line(final ActorRef jail, final ActorRef securityStation,
 				 final ActorRef bodyScanner, final ActorRef baggageScanner,
 				  final ActorRef queue, int lineId) {
-		this.jail = jail;
 		
 		this.securityStation = securityStation;
 		
