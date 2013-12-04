@@ -1,6 +1,7 @@
 import akka.actor.ActorRef;
 import akka.actor.Actors;
 import akka.actor.UntypedActor;
+import static akka.actor.Actors.*;
 
 public class Passenger extends UntypedActor {
 
@@ -39,7 +40,7 @@ public class Passenger extends UntypedActor {
 		else if(msg instanceof DocumentsFailed) {
 			System.out.println("Passenger " + passengerId + " recieves DocumentsFailed message");
 			System.out.println("Passenger " + passengerId + " leaves airport." );
-			getContext().tell(Actors.poisonPill(), getContext());
+			getContext().tell(poisonPill(), getContext());
 		}
 		else if(msg instanceof ProceedToBodyScan) {
 			System.out.println("Passenger " + passengerId + " recieves ProceedToBodyScan message");
@@ -56,7 +57,7 @@ public class Passenger extends UntypedActor {
 		else if(msg instanceof SecurityCheckPassed){
 			System.out.println("Passenger " + passengerId + " recieves SecurityCheckPassed message");
 			System.out.println("Passenger " + passengerId + " leaves the security area");
-			getContext().tell(Actors.poisonPill(),getContext());
+			getContext().tell(poisonPill(),getContext());
 		}
 		else {
 			unhandled(msg);
@@ -65,7 +66,7 @@ public class Passenger extends UntypedActor {
 	
 	@Override
 	public void postStop() {
-		//System.out.println("Passenger stopped.");
+		System.out.println("Passenger " + passengerId + " stopped.");
 	}
 	
 	///

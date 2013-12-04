@@ -38,9 +38,9 @@ public class DocumentChecker extends UntypedActor {
 	
 	@Override
 	public void postStop() {
+		System.out.println("Document Checker Stopped");
 		for(Line line : this.lines) {
 			line.shutDown();
-			//line.tell("SHUT DOWN");
 		}
 	}
 

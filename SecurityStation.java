@@ -5,6 +5,7 @@ import com.eaio.uuid.UUID;
 import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
 import akka.actor.Actors;
+import static akka.actor.Actors.*;
 
 /**
  * The SecurityStation receives reports from the scanners and decides to send a
@@ -44,7 +45,7 @@ public class SecurityStation extends UntypedActor {
 		} else if (msg instanceof Line.ShutDown){
 			shutDown++;
 			if(shutDown > 1){
-				getContext().tell(Actors.poisonPill(),null);
+				getContext().tell(poisonPill());
 			}
 		}
 		else {
@@ -54,6 +55,7 @@ public class SecurityStation extends UntypedActor {
 	
 	@Override
 	public void postStop(){
+		System.out.println("Security Station<Line "+lineId+"> shutdown");
 		String msg = "LINE STOPPED";
 		this.jail.tell(msg);
 	}
