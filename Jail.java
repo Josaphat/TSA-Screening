@@ -1,5 +1,6 @@
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Hashtable;
+import java.util.Set;
 
 import akka.actor.ActorRef;
 import akka.actor.Actors;
@@ -7,13 +8,13 @@ import akka.actor.UntypedActor;
 
 
 public class Jail extends UntypedActor {
-	private final List<ActorRef> prisoners;
+	private Hashtable<Integer,ActorRef> prisoners;
 	
 	private int shutdownCounter;
 
 	public Jail() {
 		this.shutdownCounter = 0;
-		this.prisoners = new ArrayList<ActorRef>();
+		this.prisoners = new Hashtable<Integer,ActorRef>();
 	}
 	
 	@Override
@@ -25,9 +26,9 @@ public class Jail extends UntypedActor {
 			}
 		}
 		else if(msg instanceof EnterJail) {
-			System.out.println("Jail recieves Prisoner");
-			EnterJail message = (EnterJail)msg;
-			this.prisoners.add(message.getPassenger());
+			EnterJail message = (EnterJail)msg;			
+			System.out.println("Jail recieves Passenger " + message.getPassengerId());
+			this.prisoners.put(message.getPassengerId(),message.getPassenger());
 		}
 		else {
 			unhandled(msg);
@@ -36,8 +37,10 @@ public class Jail extends UntypedActor {
 	
 	@Override
 	public void postStop() {
-		for(ActorRef prisoner : this.prisoners) {
-			prisoner.tell(Actors.poisonPill());
+		Set<Integer>keys = prisoners.keySet();
+		for(Integer i : keys) {
+			System.out.println("Jail sends Passenger " + i + " to the Permananet Detention");
+			prisoners.get(i).tell(Actors.poisonPill());
 		}		
 		System.out.println("Jail stopped.");
 	}
@@ -47,11 +50,16 @@ public class Jail extends UntypedActor {
 	//
 	static class EnterJail {
 		private final ActorRef passenger;
-		public EnterJail(final ActorRef passenger) {
+		private final int passengerId;
+		public EnterJail(final ActorRef passenger, final int passengerId) {
 			this.passenger = passenger;
+			this.passengerId = passengerId;
 		}
 		public ActorRef getPassenger() {
 			return this.passenger;
+		}
+		public int getPassengerId() {
+			return this.passengerId;
 		}
 	}
 }

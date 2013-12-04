@@ -51,7 +51,7 @@ public class Passenger extends UntypedActor {
 			System.out.println("Passenger " + passengerId + " recieves ProceedToJail message");
 			ProceedToJail message = (ProceedToJail)msg;
 			System.out.println("Passenger " + passengerId + " goes to jail!");
-			message.getJail().tell(new Jail.EnterJail(getContext()), getContext());
+			message.getJail().tell(new Jail.EnterJail(getContext(),passengerId), getContext());
 		}
 		else if(msg instanceof SecurityCheckPassed){
 			System.out.println("Passenger " + passengerId + " recieves SecurityCheckPassed message");
