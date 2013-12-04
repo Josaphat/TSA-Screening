@@ -1,7 +1,6 @@
 import java.util.List;
 
 import akka.actor.UntypedActor;
-import akka.actor.ActorRef;
 
 
 public class DocumentChecker extends UntypedActor {
