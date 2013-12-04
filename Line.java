@@ -65,7 +65,8 @@ public class Line {
 		public void onReceive(Object msg) throws Exception {
 			if(msg instanceof Baggage) {
 				Baggage message = (Baggage)msg;
-				System.out.println("Scanner<Line "+lineId+"> scans bag and sends report.");
+				System.out.println("Baggage Scanner<Line "+lineId+"> recieves Baggage");
+				System.out.println("Baggage Scanner<Line "+lineId+"> scans bag and sends report.");
 				this.securityStation.tell(new SecurityStation.SecurityReport(getContext().getSender().get(), message.isSafe()),getContext());
 			}
 			else {
@@ -97,13 +98,15 @@ public class Line {
 		@Override
 		public void onReceive(Object msg) throws Exception {
 			if(msg instanceof GiveQueue) {
+				System.out.println("Body Scanner<Line "+lineId+"> recieves GiveQueue message");
 				this.queue = ((GiveQueue)msg).getQueue();
-				System.out.println("BodyScanner <Line "+lineId+"> is ready for next passenger.");
+				System.out.println("Body Scanner<Line "+lineId+"> is ready for next passenger.");
 				this.queue.tell(new Ready(), getContext());
 			}
 			else if(msg instanceof Passenger.Body) {
+				System.out.println("Body Scanner<Line "+lineId+"> recieves Passenger Body");
 				Passenger.Body message = (Passenger.Body)msg;
-				System.out.println("BodyScanner <Line "+lineId+"> scans passenger and sends report.");
+				System.out.println("Body Scanner<Line "+lineId+"> scans passenger and sends report.");
 				this.securityStation.tell(new SecurityStation.SecurityReport(getContext().getSender().get(), message.isSafe()), getContext());
 				this.queue.tell(new Ready(), getContext());
 			} else {

@@ -22,12 +22,13 @@ public class DocumentChecker extends UntypedActor {
 	public void onReceive(Object msg) throws Exception {
 		if(msg instanceof TravelDocuments) {
 			TravelDocuments docs = (TravelDocuments)msg;
+			System.out.println("Document Checker recieves Travel Documents");
 			if(docs.areValid()) {
 				Line nextLine = this.nextLine();
-				System.out.println("Document Checker assigns Passenger" + docs.getId() + " to line " + nextLine.getId() + ".");
+				System.out.println("Document Checker assigns Passenger " + docs.getId() + " to line " + nextLine.getId() + ".");
 				getContext().getSender().get().tell(new Passenger.DocumentsPassed(nextLine.getBaggageScanner(), nextLine.getQueue()), getContext());
 			} else {
-				System.out.println("Document Checker rejects Passenger" + docs.getId() + "'s travel documents.");
+				System.out.println("Document Checker rejects Passenger " + docs.getId() + "'s travel documents.");
 				getContext().getSender().get().tell(new Passenger.DocumentsFailed(), getContext());
 			}
 		} else {

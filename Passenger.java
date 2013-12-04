@@ -17,11 +17,13 @@ public class Passenger extends UntypedActor {
 	@Override
 	public void onReceive(Object msg) throws Exception {
 		if(msg instanceof ProceedToDocumentChecker) {
+			System.out.println("Passenger " + passengerId + " recieves ProceedToDocumentChecker message");
 			ProceedToDocumentChecker message = (ProceedToDocumentChecker)msg;
 			System.out.println("Passenger " + passengerId + " gives documents to document checker." );
 			message.getDocumentChecker().tell(new DocumentChecker.TravelDocuments(passengerId), getContext());
 		}
 		else if(msg instanceof DocumentsPassed) {
+			System.out.println("Passenger " + passengerId + " recieves DocumentsPassed message");
 			DocumentsPassed message = (DocumentsPassed)msg;
 			
 			// Put baggage on the scanner
@@ -35,20 +37,24 @@ public class Passenger extends UntypedActor {
 			queue.tell(new Queue.EnterQueue(getContext()), getContext());
 		}
 		else if(msg instanceof DocumentsFailed) {
+			System.out.println("Passenger " + passengerId + " recieves DocumentsFailed message");
 			System.out.println("Passenger " + passengerId + " leaves airport." );
 			getContext().tell(Actors.poisonPill(), getContext());
 		}
 		else if(msg instanceof ProceedToBodyScan) {
+			System.out.println("Passenger " + passengerId + " recieves ProceedToBodyScan message");
 			ProceedToBodyScan message = (ProceedToBodyScan)msg;
 			System.out.println("Passenger " + passengerId + " proceeds to Body Scanner." );
 			message.getBodyScanner().tell(new Body(), getContext());
 		}
 		else if(msg instanceof ProceedToJail) {
+			System.out.println("Passenger " + passengerId + " recieves ProceedToJail message");
 			ProceedToJail message = (ProceedToJail)msg;
 			System.out.println("Passenger " + passengerId + " goes to jail!");
 			message.getJail().tell(new Jail.EnterJail(getContext()), getContext());
 		}
-		else if(msg instanceof SecurityCheckedPassed){
+		else if(msg instanceof SecurityCheckPassed){
+			System.out.println("Passenger " + passengerId + " recieves SecurityCheckPassed message");
 			System.out.println("Passenger " + passengerId + " leaves the security area");
 			getContext().tell(Actors.poisonPill(),getContext());
 		}
@@ -123,5 +129,5 @@ public class Passenger extends UntypedActor {
 		}
 	}
 
-	static class SecurityCheckedPassed {}
+	static class SecurityCheckPassed {}
 }

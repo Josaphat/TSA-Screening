@@ -25,14 +25,15 @@ public class SecurityStation extends UntypedActor {
 	@Override
 	public void onReceive(Object msg) throws Exception {
 		if(msg instanceof SecurityReport) {
+			System.out.println("Security Station<Line "+lineId+"> recieves SecurityReport");
 			SecurityReport report = (SecurityReport)msg;
 			if(this.log.containsKey(report.getPassenger().getUuid())) {
 				if(report.getScanPassed() && this.log.get(report.getPassenger().getUuid())) {
 					// TODO Send passenger on their way
-					System.out.println("SecurityStation<Line "+lineId+"> tells passenger both scans passed.");
-					report.getPassenger().tell(new Passenger.SecurityCheckedPassed(), getContext());
+					System.out.println("Security Station<Line "+lineId+"> tells passenger both scans passed.");
+					report.getPassenger().tell(new Passenger.SecurityCheckPassed(), getContext());
 				} else {
-					System.out.println("SecurityStation<Line "+lineId+"> tells passenger to go to jail.");
+					System.out.println("Security Station<Line "+lineId+"> tells passenger to go to jail.");
 					report.getPassenger().tell(new Passenger.ProceedToJail(this.jail), getContext());
 				}
 			} else {

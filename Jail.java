@@ -25,9 +25,9 @@ public class Jail extends UntypedActor {
 			}
 		}
 		else if(msg instanceof EnterJail) {
+			System.out.println("Jail recieves Prisoner");
 			EnterJail message = (EnterJail)msg;
 			this.prisoners.add(message.getPassenger());
-			System.out.println("Throwing passenger in jail.");
 		}
 		else {
 			unhandled(msg);
@@ -36,10 +36,10 @@ public class Jail extends UntypedActor {
 	
 	@Override
 	public void postStop() {
-		System.out.println("Jail stopped.");
 		for(ActorRef prisoner : this.prisoners) {
 			prisoner.tell(Actors.poisonPill());
-		}
+		}		
+		System.out.println("Jail stopped.");
 	}
 	
 	//

@@ -20,6 +20,7 @@ public class Queue extends UntypedActor {
 	@Override
 	public void onReceive(Object msg) throws Exception {
 		if(msg instanceof EnterQueue) {
+			System.out.println("Queue<Line "+lineId+"> recieves EnterQueue message");
 			ActorRef passenger = ((EnterQueue)msg).getPassenger();
 			if(this.scannerReady) {
 				System.out.println("Body Scanner<Line "+lineId+"> is ready. Send next Passenger.");
@@ -31,6 +32,7 @@ public class Queue extends UntypedActor {
 			}
 		}
 		else if(msg instanceof Line.BodyScanner.Ready) {
+			System.out.println("Queue<Line "+lineId+"> recieves BodyScannerReady message");
 			if(this.passengers.isEmpty()) {
 				this.scannerReady = true;
 			} else {
