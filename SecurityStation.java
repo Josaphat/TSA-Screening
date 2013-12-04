@@ -1,11 +1,12 @@
+import static akka.actor.Actors.poisonPill;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import com.eaio.uuid.UUID;
 import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
-import akka.actor.Actors;
-import static akka.actor.Actors.*;
+
+import com.eaio.uuid.UUID;
 
 /**
  * The SecurityStation receives reports from the scanners and decides to send a

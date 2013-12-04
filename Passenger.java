@@ -1,7 +1,6 @@
+import static akka.actor.Actors.poisonPill;
 import akka.actor.ActorRef;
-import akka.actor.Actors;
 import akka.actor.UntypedActor;
-import static akka.actor.Actors.*;
 
 public class Passenger extends UntypedActor {
 

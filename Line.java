@@ -1,7 +1,6 @@
+import static akka.actor.Actors.poisonPill;
 import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
-import akka.actor.Actors;
-import static akka.actor.Actors.*;
 
 public class Line {
 	private final ActorRef queue;
