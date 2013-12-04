@@ -30,7 +30,7 @@ public class Main {
 	 * and stops the system at the end of the day.
 	 * @param args unused
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 		System.out.println("Starting Jail");
 		final ActorRef jail = Actors.actorOf(Jail.class);
 		jail.start();
@@ -104,13 +104,12 @@ public class Main {
 				passenger.start();
 				passenger.tell(new Passenger.ProceedToDocumentChecker(docChecker), null);
 			}
-			try{
-				Thread.sleep(ONE_MINUTE);
-			} catch (InterruptedException e){}
+			
+			Thread.sleep(ONE_MINUTE);
 		}
-		try{
-				Thread.sleep(1000);
-			} catch (InterruptedException e){}
+		
+		Thread.sleep(1000);
+		
 		System.out.println("Simulation over.");
 		// Shut down the document checker. It notifies the line to shut down. Lines notify the jail.
 		docChecker.tell(Actors.poisonPill());
