@@ -4,6 +4,7 @@ import java.util.Map;
 import com.eaio.uuid.UUID;
 import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
+import akka.actor.Actors;
 
 /**
  * The SecurityStation receives reports from the scanners and decides to send a
@@ -15,6 +16,7 @@ public class SecurityStation extends UntypedActor {
 	private final ActorRef jail;
 	private final Map<UUID, Boolean> log;
 	private final int lineId;
+	private int shutDown = 0;
 	
 	public SecurityStation(final ActorRef jail, int lineId) {
 		this.jail = jail;
@@ -29,7 +31,6 @@ public class SecurityStation extends UntypedActor {
 			SecurityReport report = (SecurityReport)msg;
 			if(this.log.containsKey(report.getPassenger().getUuid())) {
 				if(report.getScanPassed() && this.log.get(report.getPassenger().getUuid())) {
-					// TODO Send passenger on their way
 					System.out.println("Security Station<Line "+lineId+"> tells passenger both scans passed.");
 					report.getPassenger().tell(new Passenger.SecurityCheckPassed(), getContext());
 				} else {
@@ -40,12 +41,22 @@ public class SecurityStation extends UntypedActor {
 				// Add this report to the map
 				this.log.put(report.getPassenger().getUuid(), report.getScanPassed());
 			}
+		} else if (msg instanceof Line.ShutDown){
+			shutDown++;
+			if(shutDown > 1){
+				getContext().tell(Actors.poisonPill(),null);
+			}
 		}
 		else {
 			unhandled(msg);
 		}
 	}
 	
+	@Override
+	public void postStop(){
+		String msg = "LINE STOPPED";
+		this.jail.tell(msg);
+	}
 	//
 	// Messages
 	//

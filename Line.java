@@ -1,5 +1,6 @@
 import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
+import akka.actor.Actors;
 
 public class Line {
 	private final ActorRef queue;
@@ -40,8 +41,8 @@ public class Line {
 	}
 	
 	public void shutDown() {
-		// TODO Coordinate killing the actors
-		// Necessary?
+		this.queue.tell(Actors.poisonPill());
+		this.baggageScanner.tell(Actors.poisonPill());
 	}
 
 	public int getId(){
@@ -73,6 +74,12 @@ public class Line {
 				unhandled(msg);
 			}
 		}
+
+		@Override
+		public void postStop(){
+			this.securityStation.tell(new Line.ShutDown(),null);
+		}
+		
 		
 		static class Baggage {
 			private final boolean isSafe;
@@ -109,9 +116,17 @@ public class Line {
 				System.out.println("Body Scanner<Line "+lineId+"> scans passenger and sends report.");
 				this.securityStation.tell(new SecurityStation.SecurityReport(getContext().getSender().get(), message.isSafe()), getContext());
 				this.queue.tell(new Ready(), getContext());
-			} else {
+			} else if(msg instanceof Line.ShutDown) {
+				getContext().tell(Actors.poisonPill(),null);
+			}
+			else {
 				unhandled(msg);
 			}
+		}
+
+		@Override
+		public void postStop(){
+			this.securityStation.tell(new Line.ShutDown(),null);
 		}
 		
 		static class Ready {
@@ -127,5 +142,8 @@ public class Line {
 				return this.queue;
 			}
 		}
+
+		
 	}
+	static class ShutDown{}
 }

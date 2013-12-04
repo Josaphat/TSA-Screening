@@ -108,13 +108,17 @@ public class Main {
 				Thread.sleep(ONE_MINUTE);
 			} catch (InterruptedException e){}
 		}
+		try{
+				Thread.sleep(1000);
+			} catch (InterruptedException e){}
 		System.out.println("Simulation over.");
 		// Shut down the document checker. It notifies the line to shut down. Lines notify the jail.
 		docChecker.tell(Actors.poisonPill());
-		jail.tell(Actors.poisonPill());
+		System.out.println("*******************.");
+		//jail.tell(Actors.poisonPill());
 		
 		// FIXME Passengers should die once they leave the security line or at the end of the day (when the jail kills them)
 		// Currently this line ices all the accumulated passenger actors at the end of the day.
-		Actors.registry().shutdownAll();
+		//Actors.registry().shutdownAll();
 	}
 }

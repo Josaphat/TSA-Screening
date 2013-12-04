@@ -40,7 +40,7 @@ public class Jail extends UntypedActor {
 		Set<Integer>keys = prisoners.keySet();
 		for(Integer i : keys) {
 			System.out.println("Jail sends Passenger " + i + " to the Permananet Detention");
-			prisoners.get(i).tell(Actors.poisonPill());
+			prisoners.get(i).tell(Actors.poisonPill(),null);
 		}		
 		System.out.println("Jail stopped.");
 	}

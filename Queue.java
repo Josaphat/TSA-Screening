@@ -48,6 +48,7 @@ public class Queue extends UntypedActor {
 	@Override
 	public void postStop() {
 		System.out.println("(Line " +lineId+  ") Queue stopped.");
+		this.bodyScanner.tell(new Line.ShutDown(), null);
 	}
 	static class EnterQueue {
 		private final ActorRef passenger;
