@@ -2,7 +2,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.eaio.uuid.UUID;
-
 import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
 
@@ -31,8 +30,9 @@ public class SecurityStation extends UntypedActor {
 				if(report.getScanPassed() && this.log.get(report.getPassenger().getUuid())) {
 					// TODO Send passenger on their way
 					System.out.println("SecurityStation<Line "+lineId+"> tells passenger both scans passed.");
+					report.getPassenger().tell(new Passenger.SecurityCheckedPassed(), getContext());
 				} else {
-					System.out.println("SecurityStation<Line "+lineId+"> arrests passenger.");
+					System.out.println("SecurityStation<Line "+lineId+"> tells passenger to go to jail.");
 					report.getPassenger().tell(new Passenger.ProceedToJail(this.jail), getContext());
 				}
 			} else {

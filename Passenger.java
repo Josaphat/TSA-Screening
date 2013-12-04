@@ -48,6 +48,10 @@ public class Passenger extends UntypedActor {
 			System.out.println("Passenger " + passengerId + " goes to jail!");
 			message.getJail().tell(new Jail.EnterJail(getContext()), getContext());
 		}
+		else if(msg instanceof SecurityCheckedPassed){
+			System.out.println("Passenger " + passengerId + " leaves the security area");
+			getContext().tell(Actors.poisonPill(),getContext());
+		}
 		else {
 			unhandled(msg);
 		}
@@ -107,7 +111,7 @@ public class Passenger extends UntypedActor {
 		}
 	}
 	
-	static class DocumentsFailed { }
+	static class DocumentsFailed {}
 	
 	static class ProceedToJail {
 		private final ActorRef jail;
@@ -118,4 +122,6 @@ public class Passenger extends UntypedActor {
 			return this.jail;
 		}
 	}
+
+	static class SecurityCheckedPassed {}
 }
