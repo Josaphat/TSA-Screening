@@ -4,6 +4,7 @@ import java.util.List;
 import akka.actor.Actor;
 import akka.actor.ActorRef;
 import akka.actor.Actors;
+import static akka.actor.Actors.*;
 import akka.actor.UntypedActor;
 import akka.actor.UntypedActorFactory;
 
@@ -71,7 +72,7 @@ public class Main {
 				}
 			});
 			queue.start();
-			bodyScanner.tell(new Line.BodyScanner.GiveQueue(queue), null);
+			bodyScanner.tell(new Line.BodyScanner.GiveQueue(queue));
 			
 			Line line = new Line(jail, securityStation, bodyScanner, bagScanner, queue,i+1);
 			lines.add(line);
@@ -102,22 +103,16 @@ public class Main {
 				});
 				passCount++;
 				passenger.start();
-				passenger.tell(new Passenger.ProceedToDocumentChecker(docChecker), null);
+				System.out.println("Passenger " + (passCount -1) + " Started");
+				passenger.tell(new Passenger.ProceedToDocumentChecker(docChecker));
 			}
 			
 			Thread.sleep(ONE_MINUTE);
 		}
-		
 		Thread.sleep(1000);
-		
 		System.out.println("Simulation over.");
 		// Shut down the document checker. It notifies the line to shut down. Lines notify the jail.
-		docChecker.tell(Actors.poisonPill());
+		docChecker.tell(poisonPill());
 		System.out.println("*******************.");
-		//jail.tell(Actors.poisonPill());
-		
-		// FIXME Passengers should die once they leave the security line or at the end of the day (when the jail kills them)
-		// Currently this line ices all the accumulated passenger actors at the end of the day.
-		//Actors.registry().shutdownAll();
 	}
 }

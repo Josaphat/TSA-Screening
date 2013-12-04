@@ -4,6 +4,7 @@ import java.util.Set;
 import akka.actor.ActorRef;
 import akka.actor.Actors;
 import akka.actor.UntypedActor;
+import static akka.actor.Actors.*;
 
 
 public class Jail extends UntypedActor {
@@ -21,7 +22,7 @@ public class Jail extends UntypedActor {
 		if(msg instanceof String && ((String)msg).equals("LINE STOPPED")) {
 			this.shutdownCounter++;
 			if(shutdownCounter == Main.NUM_LINES) {
-				getContext().tell(Actors.poisonPill(), getContext());
+				getContext().tell(poisonPill(), getContext());
 			}
 		}
 		else if(msg instanceof EnterJail) {
@@ -38,8 +39,8 @@ public class Jail extends UntypedActor {
 	public void postStop() {
 		Set<Integer>keys = prisoners.keySet();
 		for(Integer i : keys) {
-			System.out.println("Jail sends Passenger " + i + " to the Permananet Detention");
-			prisoners.get(i).tell(Actors.poisonPill(),null);
+			System.out.println("Jail sends Passenger " + i + " to the Permanent Detention");
+			prisoners.get(i).tell(poisonPill());
 		}		
 		System.out.println("Jail stopped.");
 	}
