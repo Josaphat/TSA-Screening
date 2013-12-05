@@ -30,12 +30,21 @@
 \maketitle % Creates the title page (or title section) and displays it in the document
 
 \section{Reflection on the Actor-based design method}
-\lipsum[1] % replace \lipsum commands with text
-\lipsum[2]
+An actor-based design circumvents the problems of shared mutable data (SMD) by avoiding SMD altogether.
+Any data that is part of an actor can only be accessed by the Actor from the \texttt{onReceive} method.
+A Security check-point was easy enough to create a solution for;
+the most difficulties were on the semantics of the Akka framework itself rather than issues arising from concurrency.
 
 \section{Description of changes to the original design}
-\lipsum[3]
-\lipsum[4]
-\lipsum[5]
+At the highest level, the design of the solution did not change significantly between the initial submission and the implementation.
+There was some initial misunderstanding of the capabilities of Actors and an unknowing reliance on calling methods.
+As soon as message-passing was understood as the \emph{only} way to get Actors to communicate with one another, the initial oversights in the design were addressed.
+
+The most notable design challenge was coordinating the end-of-life of the actors.
+There are many points at which the Passenger actors in the system would stop executing.
+Making sure that this is done correctly meant deciding which Actors were responsible for terminating other Actors at particular stages of the simulation.
+Additionally, there were some timing issues which needed to be addressed at the end of the simulated day;
+the Actors not only needed to be terminated in a particular order, the termination had to occur as Passengers finished using the system.
+This meant that simply sending the \texttt{poisonPill} would be insufficient and would either leave some Passengers un-checked or they would try to send messages to an Actor which had been terminated (resulting in runtime exceptions).
 
 \end{document}
